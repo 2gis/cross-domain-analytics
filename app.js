@@ -24,8 +24,6 @@ server = http.createServer( function(req, res) {
 
     res.writeHead(200, {'Content-Type': 'image/png' });
     res.end(img, 'binary');
-  } else {
-      res.end('hello new user!');
   }
 }).listen(8888);
 
