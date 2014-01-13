@@ -2,14 +2,14 @@ var http    = require('http');
 var Cookies = require('cookies');
 var fs =      require('fs');
 var ua =      require('universal-analytics');
-var img = fs.readFileSync('./2gis.png');
+var img = fs.readFileSync('./dg-tilelayer-base-copyright.png');
 
 server = http.createServer( function(req, res) {
   var cookies = new Cookies(req, res),
       clientid,
-      referal = req.headers['referer'];
+      referal = req.headers['referer'] || '';
 
-  if ( req.url == '/2gis.png' ) {
+  if ( req.url == '/dg-tilelayer-base-copyright.png' ) {
     clientid = cookies.get('clientid');
     if (!clientid) {
       clientid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -19,7 +19,8 @@ server = http.createServer( function(req, res) {
       cookies.set('clientid', clientid, {httpOnly: false});
     }
     var visitor = ua('UA-13117927-2', clientid);
-    visitor.pageview(referal).send();
+
+    visitor.pageview('/', referal).send();
 
     res.writeHead(200, {'Content-Type': 'image/png' });
     res.end(img, 'binary');
