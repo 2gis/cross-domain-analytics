@@ -1,0 +1,29 @@
+{
+  "name": "cross-domain-analytics",
+  "version": "0.0.1",
+  "description": "service for tracking unique cross domain users",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2gis/cross-domain-analytics.git"
+  },
+  "keywords": [
+    "universal",
+    "analytics",
+    "nodejs",
+    "2gis"
+  ],
+  "author": "Iaroslav Voloshchuk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/2gis/cross-domain-analytics/issues"
+  },
+  "homepage": "https://github.com/2gis/cross-domain-analytics",
+  "dependencies": {
+    "cookies": "~0.3.8",
+    "universal-analytics": "~0.3.2"
+  }
+}
