@@ -24,6 +24,7 @@
   "homepage": "https://github.com/2gis/cross-domain-analytics",
   "dependencies": {
     "cookies": "~0.3.8",
-    "universal-analytics": "~0.3.2"
+    "request": "~2.31.0",
+    "querystring": "~0.2.0"
   }
 }
