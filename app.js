@@ -10,13 +10,19 @@ var cookie = 'cid_' + config.projectPreffix;
 server = http.createServer(function (req, res) {
   var cookies = new Cookies(req, res),
       referal = req.headers['referer'] || '',
+      user_agent = req.headers['user-agent'] || '',
       params = {
+        ap: config.projectPreffix,
         dp: '/',
         dh: referal,
         v: config.apiVersion,
         tid: config.UA,
         t: 'pageview'
       },
+      ip = req.headers['x-forwarded-for'] ||
+           req.connection.remoteAddress ||
+           req.socket.remoteAddress ||
+           req.connection.socket.remoteAddress,
       clientid;
 
   if (req.url == '/' + config.image) {
@@ -36,7 +42,12 @@ server = http.createServer(function (req, res) {
 
     var path = config.hostname + config.path + '?' + qs.stringify(params);
 
-    request.post(path);
+    request.post(path, {
+      headers: {
+        'User-Agent': user_agent,
+        'IP Address': ip
+      }
+    });
 
     res.writeHead(200, {'Content-Type': 'image/png' });
     res.end(img, 'binary');
