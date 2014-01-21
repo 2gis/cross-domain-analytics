@@ -6,6 +6,6 @@ cross-domain-analytics
 * hostname - адрес сервера Google Univesal Analytics (для отправки данных через ssl нужно указать https://ssl.google-analytics.com)
 * path - юрл для запросов
 * projects - масив проектов для збора аналитки
-** projectPreffix - имя проекта (используеться как префикс для имени куки)
-** image - путь к картинке (копирайту)
-** UA - Идентификатор отслеживания в Google analytics
+  * projectPreffix - имя проекта (используеться как префикс для имени куки)
+  * image - путь к картинке (копирайту)
+  * UA - Идентификатор отслеживания в Google analytics
