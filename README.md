@@ -8,4 +8,4 @@ cross-domain-analytics
 * projects - масив проектов для сбора аналитки
   * projectPreffix - имя проекта (используеться как префикс для имени куки)
   * image - путь к картинке (копирайту)
-  * UA - Идентификатор отслеживания в Google analytics
+  * UA - идентификатор отслеживания в Google analytics
