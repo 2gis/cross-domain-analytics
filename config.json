@@ -1,8 +1,17 @@
 {
-    "image": "dg-tilelayer-base-copyright.png",
-    "projectPreffix": "mapsapi2",
-    "UA": "UA-13117927-2",
     "apiVersion": 1,
     "hostname": "http://www.google-analytics.com",
-    "path": "/collect"
+    "path": "/collect",
+    "projects": [
+        {
+            "image": "dg-tilelayer-base-copyright.png",
+            "projectPreffix": "mapsapi2",
+            "UA": "UA-13117927-2"
+        },
+        {
+            "image": "test.png",
+            "projectPreffix": "mapsapi_test",
+            "UA": "UA-13117927-2"
+        }
+    ]
 }

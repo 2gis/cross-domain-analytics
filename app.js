@@ -4,8 +4,21 @@ var fs      = require('fs');
 var qs      = require('querystring');
 var config  = require('./config.json');
 var request = require('request');
-var img = fs.readFileSync('./' + config.image);
-var cookie = 'cid_' + config.projectPreffix;
+// var img = fs.readFileSync('./' + config.image);
+// var cookie = 'cid_' + config.projectPreffix;
+
+var urls = config.projects.map(function (project) {
+  return project.image;
+});
+
+var projects = config.projects.reduce(function (obj, project) {
+  obj[project.image] = {
+    cookie: 'cid_' + project.projectPreffix,
+    image: fs.readFileSync('./' + project.image),
+    UA: project.UA,
+  };
+  return obj;
+}, {});
 
 server = http.createServer(function (req, res) {
   var cookies = new Cookies(req, res),
@@ -16,18 +29,18 @@ server = http.createServer(function (req, res) {
         dp: '/',
         dh: referal,
         v: config.apiVersion,
-        tid: config.UA,
         t: 'pageview'
       },
       ip = req.headers['x-forwarded-for'] ||
            req.connection.remoteAddress ||
            req.socket.remoteAddress ||
            req.connection.socket.remoteAddress,
+      url = req.url.substring(1),
       clientid;
 
-  if (req.url == '/' + config.image) {
+  if (urls.indexOf(url) > -1) {
 
-    clientid = cookies.get(cookie);
+    clientid = cookies.get(projects[url].cookie);
 
     if (!clientid) {
       clientid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -35,9 +48,10 @@ server = http.createServer(function (req, res) {
           return v.toString(16);
       });
 
-      cookies.set(cookie, clientid, {httpOnly: false});
+      cookies.set(projects[url].cookie, clientid, {httpOnly: false});
     }
 
+    params.tid = projects[url].UA;
     params.cid = clientid;
 
     var path = config.hostname + config.path + '?' + qs.stringify(params);
@@ -50,7 +64,10 @@ server = http.createServer(function (req, res) {
     });
 
     res.writeHead(200, {'Content-Type': 'image/png' });
-    res.end(img, 'binary');
+    res.end(projects[url].image, 'binary');
+
+  } else {
+    res.end();
   }
 
 }).listen(8888);
