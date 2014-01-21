@@ -4,8 +4,6 @@ var fs      = require('fs');
 var qs      = require('querystring');
 var config  = require('./config.json');
 var request = require('request');
-// var img = fs.readFileSync('./' + config.image);
-// var cookie = 'cid_' + config.projectPreffix;
 
 var urls = config.projects.map(function (project) {
   return project.image;
