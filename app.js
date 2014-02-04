@@ -33,7 +33,7 @@ server = http.createServer(function (req, res) {
            req.connection.remoteAddress ||
            req.socket.remoteAddress ||
            req.connection.socket.remoteAddress,
-      url = req.url.substring(1),
+      url = require('url').parse(req.url,true).pathname.substring(1),
       clientid;
 
   if (urls.indexOf(url) > -1) {
