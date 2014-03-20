@@ -4,7 +4,7 @@
     "path": "/collect",
     "projects": [
         {
-            "image": "dg-tilelayer-base-copyright.png",
+            "image": "track-user.png",
             "projectPreffix": "mapsapi2",
             "UA": "UA-38243181-3"
         },

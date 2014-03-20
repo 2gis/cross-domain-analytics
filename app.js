@@ -1,73 +1,76 @@
-var http    = require('http');
-var Cookies = require('cookies');
-var fs      = require('fs');
-var qs      = require('querystring');
-var config  = require('./config.json');
-var request = require('request');
+var fs      = require('fs'),
+    qs      = require('querystring'),
+    config  = require('./config.json'),
+    ur      = require('url'),
+    request = require('request'),
+    express = require('express'),
+    cors = require('cors'),
+    app = express(),
 
-var urls = config.projects.map(function (project) {
-  return project.image;
+    urls = config.projects.map(function (project) {
+        return project.image;
+    }),
+
+    projects = config.projects.reduce(function (obj, project) {
+        obj[project.image] = {
+            cookie: 'cid_' + project.projectPreffix,
+            image: fs.readFileSync('./' + project.image),
+            UA: project.UA
+        };
+        return obj;
+    }, {});
+
+
+app.use(cors());
+app.use(express.cookieParser());
+app.use(app.router);
+
+app.get('*', function (req, res) {
+    var referal = req.headers.referer || '',
+        user_agent = req.headers['user-agent'] || '',
+        params = {
+            ap: config.projectPreffix,
+            dp: '/',
+            dh: referal,
+            v: config.apiVersion,
+            t: 'pageview'
+        },
+        url = ur.parse(req.url, true).pathname.substring(1),
+        clientid;
+
+    if (urls.indexOf(url) > -1) {
+        clientid = req.cookies[projects[url].cookie];
+
+        if (!clientid) {
+            clientid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+
+            res.cookie(projects[url].cookie, clientid, {httpOnly: false});
+        }
+
+        params.tid = projects[url].UA;
+        params.cid = clientid;
+        params.sr = req.query.sr;
+
+        var path = config.hostname + config.path + '?' + qs.stringify(params);
+
+        request.post(path, {
+            headers: {
+                'User-Agent': user_agent,
+                'IP Address': req.query.ip
+            }
+        });
+
+        res.writeHead(200, {'Content-Type': 'image/png' });
+        res.end(projects[url].image, 'binary');
+
+    } else {
+        res.end();
+    }
 });
 
-var projects = config.projects.reduce(function (obj, project) {
-  obj[project.image] = {
-    cookie: 'cid_' + project.projectPreffix,
-    image: fs.readFileSync('./' + project.image),
-    UA: project.UA,
-  };
-  return obj;
-}, {});
-
-server = http.createServer(function (req, res) {
-  var cookies = new Cookies(req, res),
-      referal = req.headers['referer'] || '',
-      user_agent = req.headers['user-agent'] || '',
-      params = {
-        ap: config.projectPreffix,
-        dp: '/',
-        dh: referal,
-        v: config.apiVersion,
-        t: 'pageview'
-      },
-      ip = req.headers['x-forwarded-for'] ||
-           req.connection.remoteAddress ||
-           req.socket.remoteAddress ||
-           req.connection.socket.remoteAddress,
-      url = require('url').parse(req.url,true).pathname.substring(1),
-      clientid;
-
-  if (urls.indexOf(url) > -1) {
-
-    clientid = cookies.get(projects[url].cookie);
-
-    if (!clientid) {
-      clientid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-          return v.toString(16);
-      });
-
-      cookies.set(projects[url].cookie, clientid, {httpOnly: false});
-    }
-
-    params.tid = projects[url].UA;
-    params.cid = clientid;
-
-    var path = config.hostname + config.path + '?' + qs.stringify(params);
-
-    request.post(path, {
-      headers: {
-        'User-Agent': user_agent,
-        'IP Address': ip
-      }
-    });
-
-    res.writeHead(200, {'Content-Type': 'image/png' });
-    res.end(projects[url].image, 'binary');
-
-  } else {
-    res.end();
-  }
-
-}).listen(8888);
-
-console.log('Server has started.');
+app.listen(8888, function () {
+    console.log('Server listening on port 8888');
+});

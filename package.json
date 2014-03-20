@@ -23,8 +23,10 @@
   },
   "homepage": "https://github.com/2gis/cross-domain-analytics",
   "dependencies": {
-    "cookies": "~0.3.8",
     "request": "~2.31.0",
-    "querystring": "~0.2.0"
+    "querystring": "~0.2.0",
+    "cookieparser": "~0.1.0",
+    "express": "~3.4.8",
+    "cors": "~2.2.0"
   }
 }
