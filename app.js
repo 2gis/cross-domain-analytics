@@ -30,8 +30,8 @@ app.get('*', function (req, res) {
         user_agent = req.headers['user-agent'] || '',
         params = {
             ap: config.projectPreffix,
-            dp: '/',
-            dh: referal,
+            dp: referal,
+            dh: '/',
             v: config.apiVersion,
             t: 'pageview'
         },
