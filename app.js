@@ -52,14 +52,14 @@ app.get('*', function (req, res) {
 
         params.tid = projects[url].UA;
         params.cid = clientid;
-        params.sr = req.query.sr;
+        if (req.query.sr) params.sr = req.query.sr;
 
         var path = config.hostname + config.path + '?' + qs.stringify(params);
 
         request.post(path, {
             headers: {
                 'User-Agent': user_agent,
-                'IP Address': req.query.ip
+                'IP Address': req.ip
             }
         });
 
