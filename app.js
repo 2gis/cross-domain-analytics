@@ -30,8 +30,8 @@ app.get('*', function (req, res) {
         user_agent = req.headers['user-agent'] || '',
         params = {
             ap: config.projectPreffix,
-            dp: referal,
-            dh: '/',
+            dh: referal,
+            dp: '/',
             v: config.apiVersion,
             t: 'pageview'
         },
@@ -53,14 +53,16 @@ app.get('*', function (req, res) {
         params.tid = projects[url].UA;
         params.cid = clientid;
         if (req.query.sr) params.sr = req.query.sr;
+        if (req.query.version) params.version = '2';
 
-        var path = config.hostname + config.path + '?' + qs.stringify(params);
+        var path = config.hostname + config.path;
 
         request.post(path, {
             headers: {
                 'User-Agent': user_agent,
                 'IP Address': req.ip
-            }
+            },
+            qs: params
         });
 
         res.writeHead(200, {'Content-Type': 'image/png' });
