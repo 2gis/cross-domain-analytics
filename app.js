@@ -53,7 +53,7 @@ app.get('*', function (req, res) {
         params.tid = projects[url].UA;
         params.cid = clientid;
         if (req.query.sr) params.sr = req.query.sr;
-        if (req.query.version) params.version = '2';
+        if (req.query.v) params.cd1 = '2';
 
         var path = config.hostname + config.path;
 
