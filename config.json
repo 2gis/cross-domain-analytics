@@ -1,17 +1,17 @@
 {
-    "apiVersion": 1,
-    "hostname": "http://www.google-analytics.com",
-    "path": "/collect",
-    "projects": [
-        {
-            "image": "track-user.png",
-            "projectPreffix": "mapsapi2",
-            "UA": "UA-38243181-3"
-        },
-        {
-            "image": "dg-map-copyright.png",
-            "projectPreffix": "mapsapi1",
-            "UA": "UA-38243181-4"
-        }
-    ]
+  "apiVersion": "1",
+  "hostname": "http://www.google-analytics.com",
+  "path": "/collect",
+  "projects": [
+    {
+      "prefix": "mapsapi2",
+      "image": "track-user.png",
+      "UA": "UA-38243181-3"
+    },
+    {
+      "prefix": "mapsapi1",
+      "image": "dg-map-copyright.png",
+      "UA": "UA-38243181-4"
+    }
+  ]
 }

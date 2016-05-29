@@ -13,7 +13,7 @@ var fs      = require('fs'),
 
     projects = config.projects.reduce(function (obj, project) {
         obj[project.image] = {
-            cookie: 'cid_' + project.projectPreffix,
+            cookie: 'cid_' + project.prefix,
             image: fs.readFileSync('./' + project.image),
             UA: project.UA
         };
@@ -29,7 +29,7 @@ app.get('*', function (req, res) {
     var referal = req.headers.referer || '',
         user_agent = req.headers['user-agent'] || '',
         params = {
-            ap: config.projectPreffix,
+            ap: config.prefix,
             dl: referal,
             v: config.apiVersion,
             t: 'pageview'
