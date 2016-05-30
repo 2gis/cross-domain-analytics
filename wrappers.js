@@ -49,14 +49,16 @@ exports.recvBody = (req, expBodyLen) => new Promise((resolve, reject) => {
     }
 
     function clearEvents () {
-        req.removeListener('end', onEnd);
-        req.removeListener('error', onError);
-        req.removeListener('readable', onReadable);
+        req
+            .removeListener('end', onEnd)
+            .removeListener('error', onError)
+            .removeListener('readable', onReadable);
     }
 
-    req.on('readable', onReadable);
-    req.on('error', onError);
-    req.on('end', onEnd);
+    req
+        .on('readable', onReadable)
+        .on('error', onError)
+        .on('end', onEnd);
 });
 
 exports.sendBody = (res, status, body) => new Promise((resolve, reject) => {
@@ -84,14 +86,16 @@ exports.sendBody = (res, status, body) => new Promise((resolve, reject) => {
     }
 
     function clearEvents () {
-        res.removeListener('close', onCloseOrError);
-        res.removeListener('error', onCloseOrError);
-        res.removeListener('finish', onFinish);
+        res
+            .removeListener('close', onCloseOrError)
+            .removeListener('error', onCloseOrError)
+            .removeListener('finish', onFinish);
     }
 
-    res.on('finish', onFinish);
-    res.on('error', onCloseOrError);
-    res.on('close', onCloseOrError);
+    res
+        .on('finish', onFinish)
+        .on('error', onCloseOrError)
+        .on('close', onCloseOrError);
 
     //  There is nothing to do special if 'body' is a empty buffer or string
     res.end(body);

@@ -1,5 +1,6 @@
 'use strict';
 
+const ping = {};
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
@@ -8,6 +9,7 @@ const config  = require('./config');
 const wrappers = require('./wrappers');
 const recvBody = wrappers.recvBody;
 const sendBody = wrappers.sendBody;
+const fork = require('child_process').fork;
 
 const projects = config.projects.map(project => ({
         cookieName: 'cid_' + project.prefix,
@@ -61,16 +63,12 @@ server.on('request', (req, res) => {
         urlObj = url.parse(req.url, true);
         reqPath = urlObj.pathname ? urlObj.pathname.toLowerCase() : '';
         project = projects.find(project => project.imagePath === reqPath);
+        if (!project) status = 404;
     } else {
         status = 414;
     }
 
-    //  We don't support incoming content
-    if (req.headers['content-type']) {
-        status = 415;
-    }
-
-    if (status < 400 && project) {
+    if (status < 400 ) {
         //  Get cookies
         cookie = cookies.parse(req.headers.cookie);
         let cid = cookie[project.cookieName];
@@ -81,35 +79,25 @@ server.on('request', (req, res) => {
         }
         //  TODO: check for API parameters
         let analytic = {
-            headers: {
-                'User-Agent': req.headers['user-agent'] || ''
-            },
-            qs: {
-                v: config.apiVersion,
-                tid: project.ua,
-                cid: cid,
-                uip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',', 1)[0],
-                ua: req.headers['user-agent'] || '',
+            v: config.apiVersion,
+            tid: project.ua,
+            cid: cid,
+            uip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',', 1)[0],
+            ua: req.headers['user-agent'] || '',
 
-                t: 'pageview',
-                an: project.prefix,
-                dr: req.headers['referer'] || '',
-                sr: (urlObj.query || {}).sr || ''
-            }
+            t: 'pageview',
+            an: project.prefix,
+            dr: req.headers['referer'] || '',
+            sr: (urlObj.query || {}).sr || ''
         };
-        //sendAnalytic(analytic);
-    } else {
-        status = 404;
-    }
+        child.send(analytic);
 
-
-    if (status < 400) {
         recvBody(req, expBodyLen)
             .then(status => sendBody(res, status, project.imageData))
-            .catch(err => req.client.destroy());
+            .catch(err => {/* req.connection.destroy() */});
     } else {
         sendBody(res, status, null)
-            .catch(err => req.client.destroy());
+            .catch(err => {/* req.connection.destroy() */});
     }
 
     // console.log(require('util').inspect(req, {showHidden: true, depth: 1, maxArrayLength: 0}));
@@ -118,4 +106,44 @@ server.on('request', (req, res) => {
     //  req.socket === req.connection === req.client === res.socket === res.connection
 });
 
-server.listen(3000);
+
+//  Child maintenance block
+let child;
+
+function onMessage (msg) {
+    if (msg === null) {
+        if (!server.lisnening) {
+            let port = 3000;
+            server.listen(port).lisnening = true;   //  remove in Node.js v6.0+
+            console.log(`Server listening on port ${port}`);
+        }
+    }
+}
+function onError (err) {
+    switch (err.message) {
+        case 'channel closed': reSpawn(); break;
+        default: console.log(`Child error (unknown reason): ${err.message}`);
+    }
+}
+function onExit (code, signal) {
+    //
+}
+
+function reSpawn (escape) {
+    if (child) child
+        .removeListener('exit', onExit)
+        .removeListener('error', onError)
+        .removeListener('message', onMessage);
+
+    if (!escape) child = fork('./worker')
+        .on('message', onMessage)
+        .on('error', onError)
+        .on('exit', onExit);
+}
+
+reSpawn();
+
+
+setInterval(() => {
+    console.log(process.memoryUsage());
+}, 5000);
