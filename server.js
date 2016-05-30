@@ -1,13 +1,13 @@
 'use strict';
 
-const maxURLStringLength = 2083;
-const maxAcceptedBodyLength = 10 * 1024;
-
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
 const cookies = require('./cookies');
 const config  = require('./config');
+const wrappers = require('./wrappers');
+const recvBody = wrappers.recvBody;
+const sendBody = wrappers.sendBody;
 
 const projects = config.projects.map(project => ({
         cookieName: 'cid_' + project.prefix,
@@ -39,14 +39,15 @@ server.on('request', (req, res) => {
     //  but specs allow non-empty bodies in requests in such case
     //  so have to proceed with this in mind
 
-    //  Process body headers; the logic is complex, see 'rfc7230#section-3.3'
+    //  Process body headers
+    //  The logic is relatively complex, see 'rfc7230#section-3.3' for details
     if (req.headers['transfer-encoding']) {
         expBodyLen = -1;
         if (req.headers['transfer-encoding'] !== 'chunked' ||
             req.headers['content-length']) status = 400;
     } else if (req.headers['content-length']) {
         expBodyLen = parseInt(req.headers['content-length'], 10);
-        if (isNaN(expBodyLen) || expBodyLen < 0 || expBodyLen > maxAcceptedBodyLength) status = 400;
+        if (isNaN(expBodyLen) || expBodyLen < 0 ) status = 400;
     }
 
     //  Check for supported HTTP method
@@ -56,7 +57,7 @@ server.on('request', (req, res) => {
     }
 
     //  Check for valid URL
-    if ('string' === typeof req.url && req.url.length < maxURLStringLength) {
+    if ('string' === typeof req.url && req.url.length < 2083) {
         urlObj = url.parse(req.url, true);
         reqPath = urlObj.pathname ? urlObj.pathname.toLowerCase() : '';
         project = projects.find(project => project.imagePath === reqPath);
@@ -97,12 +98,19 @@ server.on('request', (req, res) => {
             }
         };
         //sendAnalytic(analytic);
+    } else {
+        status = 404;
     }
-    //processRequest(project, status, expBodyLen);
 
 
-    // res.setHeader('Content-Type', 'image/png');
-    // res.setHeader('Content-Length', project.imageData.length);
+    if (status < 400) {
+        recvBody(req, expBodyLen)
+            .then(status => sendBody(res, status, project.imageData))
+            .catch(err => req.client.destroy());
+    } else {
+        sendBody(res, status, null)
+            .catch(err => req.client.destroy());
+    }
 
     // console.log(require('util').inspect(req, {showHidden: true, depth: 1, maxArrayLength: 0}));
     // res.end();

@@ -56,13 +56,13 @@ function cookieExtract (str, start, end) {
 
 var trimForward = function (str, i) {
     let ch = str.charCodeAt(i);
-    while (ch <= 32) ch = str.charCodeAt(++i);
+    while (ch < 33) ch = str.charCodeAt(++i);
     return i;
 };
 
 var trimBackward = function (str, i) {
     let ch = str.charCodeAt(i);
-    while (ch <= 32) ch = str.charCodeAt(--i);
+    while (ch < 33) ch = str.charCodeAt(--i);
     return i;
 };
 
