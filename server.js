@@ -4,9 +4,9 @@ const ping = {};
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
-const cookies = require('./cookies');
 const config  = require('./config');
-const wrappers = require('./wrappers');
+const cookies = require('./utility/cookies');
+const wrappers = require('./utility/wrappers');
 const recvBody = wrappers.recvBody;
 const sendBody = wrappers.sendBody;
 const fork = require('child_process').fork;
@@ -22,11 +22,13 @@ const projects = config.projects.map(project => ({
 
 
 const server = http.createServer();
+
 server.on('connection', (socket) => {
     //  We're dealing with very small (less than 64KB) responses
     //  So we don't need additional Nagle's delay on a sending half
     socket.setNoDelay(true);
 });
+
 server.on('request', (req, res) => {
     let urlObj,
         cookie,
@@ -77,6 +79,7 @@ server.on('request', (req, res) => {
                 (c, r) => (r = Math.random() * 16 | 0, (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)));
             res.setHeader('Set-Cookie', cookies.serialize(project.cookieName, cid));
         }
+
         //  TODO: check for API parameters
         let analytic = {
             v: config.apiVersion,
@@ -90,7 +93,7 @@ server.on('request', (req, res) => {
             dr: req.headers['referer'] || '',
             sr: (urlObj.query || {}).sr || ''
         };
-        child.send(analytic);
+        worker.send(analytic);
 
         recvBody(req, expBodyLen)
             .then(status => sendBody(res, status, project.imageData))
@@ -99,16 +102,11 @@ server.on('request', (req, res) => {
         sendBody(res, status, null)
             .catch(err => {/* req.connection.destroy() */});
     }
-
-    // console.log(require('util').inspect(req, {showHidden: true, depth: 1, maxArrayLength: 0}));
-    // res.end();
-
-    //  req.socket === req.connection === req.client === res.socket === res.connection
 });
 
 
-//  Child maintenance block
-let child;
+//  Worker maintenance block  ------------------------------------------------------------------------------------------
+let worker;
 
 function onMessage (msg) {
     if (msg === null) {
@@ -119,23 +117,25 @@ function onMessage (msg) {
         }
     }
 }
+
 function onError (err) {
     switch (err.message) {
         case 'channel closed': reSpawn(); break;
         default: console.log(`Child error (unknown reason): ${err.message}`);
     }
 }
+
 function onExit (code, signal) {
-    //
+    //reSpawn(true);
 }
 
 function reSpawn (escape) {
-    if (child) child
+    if (worker) worker
         .removeListener('exit', onExit)
         .removeListener('error', onError)
         .removeListener('message', onMessage);
 
-    if (!escape) child = fork('./worker')
+    if (!escape) worker = fork('./worker')
         .on('message', onMessage)
         .on('error', onError)
         .on('exit', onExit);
@@ -143,7 +143,6 @@ function reSpawn (escape) {
 
 reSpawn();
 
-
-setInterval(() => {
-    console.log(process.memoryUsage());
-}, 5000);
+// setInterval(() => {
+//     console.log(process.memoryUsage());
+// }, 5000);

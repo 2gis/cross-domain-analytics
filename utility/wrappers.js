@@ -100,3 +100,33 @@ exports.sendBody = (res, status, body) => new Promise((resolve, reject) => {
     //  There is nothing to do special if 'body' is a empty buffer or string
     res.end(body);
 });
+
+exports.request = (req, msg) => new Promise((resolve, reject) => {
+    function onFinish () {
+        process.nextTick(clearEvents);
+        resolve();
+    }
+
+    function onError () {
+        process.nextTick(clearEvents);
+        reject();
+    }
+
+    function clearEvents () {
+        req
+            .removeListener('error', onError)
+            .removeListener('finish', onFinish);
+    }
+
+    req
+        .on('finish', onFinish)
+        .on('error', onError);
+
+    // req.on('response', (res) => {
+    //     console.log(`Status: ${res.statusCode}`);
+    //     res.on('data', data => {console.log('Data: ', data.toString())});
+    // });
+
+    req.setNoDelay(true);
+    req.end(msg);
+});
