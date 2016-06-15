@@ -122,11 +122,6 @@ exports.request = (req, msg) => new Promise((resolve, reject) => {
         .on('finish', onFinish)
         .on('error', onError);
 
-    // req.on('response', (res) => {
-    //     console.log(`Status: ${res.statusCode}`);
-    //     res.on('data', data => {console.log('Data: ', data.toString())});
-    // });
-
     req.setNoDelay(true);
     req.end(msg);
 });

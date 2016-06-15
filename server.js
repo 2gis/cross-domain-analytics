@@ -1,6 +1,5 @@
 'use strict';
 
-const ping = {};
 const fs = require('fs');
 const url = require('url');
 const http = require('http');
@@ -112,7 +111,7 @@ function onMessage (msg) {
     if (msg === null) {
         if (!server.lisnening) {
             let port = 3000;
-            server.listen(port).lisnening = true;   //  remove in Node.js v6.0+
+            server.listen(port).lisnening = true;   //  TODO: Remove in Node.js v6.0+
             console.log(`Server listening on port ${port}`);
         }
     }
@@ -142,7 +141,3 @@ function reSpawn (escape) {
 }
 
 reSpawn();
-
-// setInterval(() => {
-//     console.log(process.memoryUsage());
-// }, 5000);

@@ -1,5 +1,7 @@
 'use strict';
 
+//  For original reference see https://github.com/petkaantonov/cookieparser
+
 const maxCookieStringLength = 4096;
 
 const encode = require('querystring').escape;
