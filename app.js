@@ -72,7 +72,7 @@ app.get('*', function (req, res) {
     }
 });
 
-app.listen(8080, function () {
+app.listen(8888, function () {
     logger.info('Server listening on port 8888');
 }).on('error', function (error) {
     logger.error(error.message, error.stack);
