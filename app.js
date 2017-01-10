@@ -5,6 +5,7 @@ var fs      = require('fs'),
     request = require('request'),
     express = require('express'),
     cors = require('cors'),
+    logger = require('./logger'),
     app = express(),
 
     urls = config.projects.map(function (project) {
@@ -71,6 +72,12 @@ app.get('*', function (req, res) {
     }
 });
 
-app.listen(8888, function () {
-    console.log('Server listening on port 8888');
+app.listen(8080, function () {
+    logger.info('Server listening on port 8888');
+}).on('error', function (error) {
+    logger.error(error.message, error.stack);
+});
+
+process.on('uncaughtException', function (error) {
+    logger.error(error.message, error.stack);
 });
