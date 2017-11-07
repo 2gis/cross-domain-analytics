@@ -30,11 +30,14 @@ app.get('*', function (req, res) {
     var referal = req.headers.referer || '',
         user_agent = req.headers['user-agent'] || '',
         params = {
-            ap: config.projectPreffix,
-            dr: referal,
+            // Обязательный параметр для pageview
+            dl: referal,
+
             v: config.apiVersion,
             t: 'pageview',
-            ua: user_agent
+            ua: user_agent,
+
+            uip: req.ip,
         },
         url = ur.parse(req.url, true).pathname.substring(1),
         clientid;
@@ -58,6 +61,9 @@ app.get('*', function (req, res) {
         var path = config.hostname + config.path;
 
         request.post(path, {
+            headers: {
+                'User-Agent': user_agent
+            },
             qs: params
         });
 
