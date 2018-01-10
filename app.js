@@ -1,6 +1,6 @@
 var fs      = require('fs'),
     qs      = require('querystring'),
-    config  = require('./config.json'),
+    config  = require('./config'),
     ur      = require('url'),
     request = require('request'),
     express = require('express'),

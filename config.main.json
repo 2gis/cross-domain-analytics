@@ -13,5 +13,7 @@
             "projectPreffix": "mapsapi1",
             "UA": "UA-38243181-4"
         }
-    ]
+    ],
+
+    "logPath": "app.log"
 }
