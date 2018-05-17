@@ -1,5 +1,4 @@
 var fs      = require('fs'),
-    qs      = require('querystring'),
     config  = require('./config'),
     ur      = require('url'),
     request = require('request'),
@@ -35,9 +34,7 @@ app.get('*', function (req, res) {
 
             v: config.apiVersion,
             t: 'pageview',
-            ua: user_agent,
-
-            uip: req.ip,
+            ua: user_agent
         },
         url = ur.parse(req.url, true).pathname.substring(1),
         clientid;

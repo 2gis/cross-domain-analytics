@@ -3,3 +3,4 @@ app.log
 nohup.out
 yarn.lock
 config.local.json
+.idea
