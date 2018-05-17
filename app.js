@@ -20,6 +20,25 @@ var fs      = require('fs'),
         return obj;
     }, {});
 
+// Работает только с IP V4
+function anonymizeIP(ip) {
+    var ipV4Parts = ip.split('.');
+    var ipV6Parts = ip.split(':');
+
+    if (ipV4Parts.length === 4) {
+        ipV4Parts[3] = '0';
+        return ipV4Parts.join('.');
+    }
+
+    if (ipV6Parts.length > 1) {
+        ipV6Parts[ipV6Parts.length - 1] = '';
+
+        return ipV6Parts.join(':');
+    }
+
+    // Пришло что-то невалидное — отправим как есть
+    return ip;
+}
 
 app.use(cors());
 app.use(express.cookieParser());
@@ -34,7 +53,9 @@ app.get('*', function (req, res) {
 
             v: config.apiVersion,
             t: 'pageview',
-            ua: user_agent
+            ua: user_agent,
+
+            uip: anonymizeIP(req.ip)
         },
         url = ur.parse(req.url, true).pathname.substring(1),
         clientid;
