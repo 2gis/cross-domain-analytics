@@ -20,7 +20,6 @@ var fs      = require('fs'),
         return obj;
     }, {});
 
-// Работает только с IP V4
 function anonymizeIP(ip) {
     var ipV4Parts = ip.split('.');
     var ipV6Parts = ip.split(':');
