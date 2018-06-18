@@ -28,6 +28,7 @@
     "cookieparser": "~0.1.0",
     "express": "~3.4.8",
     "cors": "~2.2.0",
+    "lookup-dns-cache": "^2.0.0",
     "winston": "2.3.0"
   }
 }
