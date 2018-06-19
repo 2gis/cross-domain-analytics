@@ -6,6 +6,7 @@ var fs      = require('fs'),
     cors = require('cors'),
     logger = require('./logger'),
     app = express(),
+    lookupDnsCache = require('lookup-dns-cache'),
 
     urls = config.projects.map(function (project) {
         return project.image;
@@ -81,6 +82,7 @@ app.get('*', function (req, res) {
             headers: {
                 'User-Agent': user_agent
             },
+            lookup: lookupDnsCache.lookup,
             qs: params
         });
 
