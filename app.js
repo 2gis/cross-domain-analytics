@@ -61,7 +61,8 @@ app.get('*', function (req, res) {
         clientid;
 
     if (urls.indexOf(url) > -1) {
-        clientid = req.cookies[projects[url].cookie];
+        var project = projects[url];
+        clientid = req.cookies[project.cookie];
 
         if (!clientid) {
             clientid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -69,25 +70,28 @@ app.get('*', function (req, res) {
                 return v.toString(16);
             });
 
-            res.cookie(projects[url].cookie, clientid, {httpOnly: false});
+            res.cookie(project.cookie, clientid, {httpOnly: false});
         }
 
-        params.tid = projects[url].UA;
+        params.tid = project.UA;
         params.cid = clientid;
-        if (req.query.sr) params.sr = req.query.sr;
+        if (req.query.sr) {
+            params.sr = req.query.sr;
+        }
 
-        var path = config.hostname + config.path;
-
-        request.post(path, {
-            headers: {
-                'User-Agent': user_agent
-            },
-            lookup: lookupDnsCache.lookup,
-            qs: params
-        });
+        // sampleRate - механиз уменьшения выборки, чтобы не выходить за лимиты
+        if (Math.random() < project.sampleRate) {
+            request.post(config.hostname + config.path, {
+                headers: {
+                    'User-Agent': user_agent
+                },
+                lookup: lookupDnsCache.lookup,
+                qs: params
+            });
+        }
 
         res.writeHead(200, {'Content-Type': 'image/png' });
-        res.end(projects[url].image, 'binary');
+        res.end(project.image, 'binary');
 
     } else {
         res.end();
