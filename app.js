@@ -79,7 +79,7 @@ app.get('*', function (req, res) {
             params.sr = req.query.sr;
         }
 
-        // sampleRate - механиз уменьшения выборки, чтобы не выходить за лимиты
+        // sampleRate - механизм уменьшения выборки, чтобы не выходить за лимиты
         if (Math.random() < project.sampleRate) {
             request.post(config.hostname + config.path, {
                 headers: {
