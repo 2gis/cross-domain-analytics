@@ -6,12 +6,14 @@
         {
             "image": "track-user.png",
             "projectPreffix": "mapsapi2",
-            "UA": "UA-38243181-3"
+            "UA": "UA-38243181-3",
+            "sampleRate": 0.5
         },
         {
             "image": "dg-map-copyright.png",
             "projectPreffix": "mapsapi1",
-            "UA": "UA-38243181-4"
+            "UA": "UA-38243181-4",
+            "sampleRate": 1
         }
     ],
 
